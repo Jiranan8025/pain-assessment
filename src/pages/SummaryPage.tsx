@@ -6,6 +6,7 @@ import { getAssessmentById, getPatientById, deleteAssessment } from '../lib/supa
 import { showError, showSuccess } from '../lib/toast';
 import AssessmentSummary from '../components/summary/AssessmentSummary';
 import { formatThaiDate } from '../lib/dateUtils';
+import { exportToPdf } from '../lib/pdfExport';
 
 export default function SummaryPage() {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +23,7 @@ export default function SummaryPage() {
   const [loading, setLoading] = useState(!assessment);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     if (assessment && patient) return;
@@ -51,6 +53,20 @@ export default function SummaryPage() {
     contentRef: summaryRef,
     documentTitle: `Assessment_${patient?.hn || 'unknown'}_${assessment?.assessment_date || ''}`,
   });
+
+  const handleExportPdf = async () => {
+    if (!summaryRef.current) return;
+    setIsExporting(true);
+    try {
+      const filename = `Assessment_${patient?.hn || 'unknown'}_${assessment?.assessment_date || ''}.pdf`;
+      await exportToPdf(summaryRef.current, filename);
+    } catch (err) {
+      console.error(err);
+      showError('ไม่สามารถ Export PDF ได้');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (!id) return;
@@ -118,12 +134,21 @@ export default function SummaryPage() {
             ลบ
           </button>
         </div>
-        <button
-          onClick={() => handlePrint()}
-          className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-sm shadow-md"
-        >
-          พิมพ์ Summary
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleExportPdf}
+            disabled={isExporting}
+            className="px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-sm shadow-md disabled:opacity-50"
+          >
+            {isExporting ? 'กำลัง Export...' : 'PDF'}
+          </button>
+          <button
+            onClick={() => handlePrint()}
+            className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-sm shadow-md"
+          >
+            พิมพ์
+          </button>
+        </div>
       </div>
 
       {/* Delete Confirmation */}

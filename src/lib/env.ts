@@ -6,6 +6,8 @@ interface EnvConfig {
   supabaseUrl: string | null;
   supabaseAnonKey: string | null;
   isSupabaseConfigured: boolean;
+  adminEmail: string;
+  adminPassword: string;
 }
 
 function validateEnv(): EnvConfig {
@@ -35,10 +37,15 @@ function validateEnv(): EnvConfig {
     );
   }
 
+  const adminEmail = (import.meta.env.VITE_ADMIN_EMAIL || '').trim().toLowerCase();
+  const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || '';
+
   return {
     supabaseUrl: hasUrl ? supabaseUrl : null,
     supabaseAnonKey: hasKey ? supabaseAnonKey : null,
     isSupabaseConfigured,
+    adminEmail,
+    adminPassword,
   };
 }
 

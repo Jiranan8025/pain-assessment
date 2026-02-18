@@ -82,6 +82,20 @@ export async function createPatient(patient: Omit<Patient, 'id' | 'created_at'>)
   return newPatient;
 }
 
+export async function updatePatient(id: string, updates: { hn?: string; full_name?: string }): Promise<Patient | null> {
+  if (supabase) {
+    const { data, error } = await supabase.from('patients').update(updates).eq('id', id).select().single();
+    if (error) throw error;
+    return data;
+  }
+  const patients = getLocalData<Patient>('patients');
+  const idx = patients.findIndex(p => p.id === id);
+  if (idx === -1) return null;
+  patients[idx] = { ...patients[idx], ...updates };
+  setLocalData('patients', patients);
+  return patients[idx];
+}
+
 export async function findOrCreatePatient(hn: string, fullName: string): Promise<Patient> {
   if (supabase) {
     const { data } = await supabase.from('patients').select('*').eq('hn', hn).single();

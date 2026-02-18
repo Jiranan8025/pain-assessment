@@ -1,12 +1,16 @@
-import { useEffect } from 'react';
-import { useBlocker } from 'react-router-dom';
+import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * แสดงข้อความเตือนเมื่อผู้ใช้พยายามออกจากหน้าที่มีข้อมูลยังไม่ได้บันทึก
- * - กดปุ่มย้อนกลับ / เปลี่ยนหน้า → React Router blocker
  * - ปิดแท็บ / รีเฟรช → beforeunload event
+ * - เปลี่ยนหน้าใน app → ใช้ custom confirm dialog (ไม่ใช้ useBlocker เพราะต้องการ data router)
  */
 export function useUnsavedWarning(hasUnsavedChanges: boolean) {
+  const [blockerState, setBlockerState] = useState<'idle' | 'blocked'>('idle');
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
+  const navigate = useNavigate();
+
   // Block browser tab close / refresh
   useEffect(() => {
     if (!hasUnsavedChanges) return;
@@ -17,8 +21,22 @@ export function useUnsavedWarning(hasUnsavedChanges: boolean) {
     return () => window.removeEventListener('beforeunload', handler);
   }, [hasUnsavedChanges]);
 
-  // Block React Router navigation
-  const blocker = useBlocker(hasUnsavedChanges);
+  const proceed = useCallback(() => {
+    setBlockerState('idle');
+    if (pendingPath) {
+      navigate(pendingPath);
+      setPendingPath(null);
+    }
+  }, [pendingPath, navigate]);
 
-  return blocker;
+  const reset = useCallback(() => {
+    setBlockerState('idle');
+    setPendingPath(null);
+  }, []);
+
+  return {
+    state: blockerState as 'idle' | 'blocked',
+    proceed,
+    reset,
+  };
 }

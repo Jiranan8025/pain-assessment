@@ -6,6 +6,7 @@ import { calculateEq5dUtility } from '../lib/scoring';
 import { showError } from '../lib/toast';
 import TrendChart from '../components/ui/TrendChart';
 import { formatThaiDate, formatShortDate } from '../lib/dateUtils';
+import AssessmentCompare from '../components/summary/AssessmentCompare';
 
 export default function AssessmentHistoryPage() {
   const { patientId } = useParams<{ patientId: string }>();
@@ -13,6 +14,9 @@ export default function AssessmentHistoryPage() {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showChart, setShowChart] = useState(true);
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareSelected, setCompareSelected] = useState<string[]>([]);
+  const [showCompare, setShowCompare] = useState(false);
 
   useEffect(() => {
     if (!patientId) return;
@@ -75,6 +79,17 @@ export default function AssessmentHistoryPage() {
     { name: 'Anxiety', color: '#ec4899', data: sorted.map(a => ({ label: makeLabel(a), value: a.dass21_anxiety })) },
     { name: 'Stress', color: '#f59e0b', data: sorted.map(a => ({ label: makeLabel(a), value: a.dass21_stress })) },
   ];
+
+  const toggleCompareSelect = (id: string) => {
+    setCompareSelected(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      if (prev.length >= 2) return [prev[1], id]; // replace oldest selection
+      return [...prev, id];
+    });
+  };
+
+  const compareA = assessments.find(a => a.id === compareSelected[0]);
+  const compareB = assessments.find(a => a.id === compareSelected[1]);
 
   if (loading) {
     return (
@@ -155,34 +170,93 @@ export default function AssessmentHistoryPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {assessments.map((a, index) => (
-            <Link
-              key={a.id}
-              to={`/summary/${a.id}`}
-              className="block p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
-                    {assessments.length - index}
-                  </span>
-                  <div>
-                    <span className="font-medium">{formatThaiDate(a.assessment_date)}</span>
-                    <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">
-                      {visitLabel[a.visit_type] || a.visit_type}
-                    </span>
+          {/* Compare Mode Toggle */}
+          {assessments.length >= 2 && (
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => { setCompareMode(!compareMode); setCompareSelected([]); }}
+                className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-all ${
+                  compareMode
+                    ? 'bg-purple-100 text-purple-700 border border-purple-300'
+                    : 'bg-gray-100 text-gray-600 hover:text-purple-700'
+                }`}
+              >
+                {compareMode ? 'ยกเลิกเปรียบเทียบ' : 'เปรียบเทียบ 2 ครั้ง'}
+              </button>
+              {compareMode && compareSelected.length === 2 && (
+                <button
+                  onClick={() => setShowCompare(true)}
+                  className="px-4 py-1.5 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700"
+                >
+                  ดูผลเปรียบเทียบ
+                </button>
+              )}
+              {compareMode && compareSelected.length < 2 && (
+                <span className="text-xs text-gray-400">เลือก {compareSelected.length}/2 รายการ</span>
+              )}
+            </div>
+          )}
+
+          {assessments.map((a, index) => {
+            const isSelected = compareSelected.includes(a.id!);
+            return (
+              <div
+                key={a.id}
+                className={`p-4 bg-white rounded-lg border transition-all ${
+                  compareMode && isSelected
+                    ? 'border-purple-400 bg-purple-50 shadow-sm'
+                    : 'border-gray-200 hover:border-blue-300 hover:shadow-sm'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {compareMode ? (
+                      <button
+                        onClick={() => toggleCompareSelect(a.id!)}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
+                          isSelected
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-200 text-gray-500 hover:bg-purple-200'
+                        }`}
+                      >
+                        {isSelected ? '✓' : assessments.length - index}
+                      </button>
+                    ) : (
+                      <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
+                        {assessments.length - index}
+                      </span>
+                    )}
+                    <div>
+                      <span className="font-medium">{formatThaiDate(a.assessment_date)}</span>
+                      <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                        {visitLabel[a.visit_type] || a.visit_type}
+                      </span>
+                    </div>
                   </div>
+                  {!compareMode && (
+                    <Link to={`/summary/${a.id}`} className="text-blue-600 text-sm hover:underline">
+                      ดู Summary &rarr;
+                    </Link>
+                  )}
                 </div>
-                <span className="text-blue-600 text-sm">ดู Summary &rarr;</span>
+                <div className="mt-2 ml-11 flex gap-6 text-xs text-gray-500">
+                  <span>Pain: Max <strong>{a.pain_score_max}</strong>, Now <strong>{a.pain_score_now}</strong></span>
+                  <span>VAS: <strong>{a.eq5d_vas}</strong>/100</span>
+                  <span>DASS: D=<strong>{a.dass21_depression}</strong> A=<strong>{a.dass21_anxiety}</strong> S=<strong>{a.dass21_stress}</strong></span>
+                </div>
               </div>
-              <div className="mt-2 ml-11 flex gap-6 text-xs text-gray-500">
-                <span>Pain: Max <strong>{a.pain_score_max}</strong>, Now <strong>{a.pain_score_now}</strong></span>
-                <span>VAS: <strong>{a.eq5d_vas}</strong>/100</span>
-                <span>DASS: D=<strong>{a.dass21_depression}</strong> A=<strong>{a.dass21_anxiety}</strong> S=<strong>{a.dass21_stress}</strong></span>
-              </div>
-            </Link>
-          ))}
+            );
+          })}
         </div>
+      )}
+
+      {/* Compare Modal */}
+      {showCompare && compareA && compareB && (
+        <AssessmentCompare
+          a={compareA}
+          b={compareB}
+          onClose={() => setShowCompare(false)}
+        />
       )}
     </div>
   );

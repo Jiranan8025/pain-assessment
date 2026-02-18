@@ -166,11 +166,11 @@ export default function PatientFormPage() {
             <h3 className="text-lg font-bold text-gray-800 mb-2">ออกจากแบบประเมิน?</h3>
             <p className="text-sm text-gray-600 mb-4">ข้อมูลที่กรอกไว้จะถูกบันทึกเป็นฉบับร่าง สามารถกลับมากรอกต่อได้</p>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => blocker.reset?.()}
+              <button onClick={() => blocker.reset()}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium">
                 กรอกต่อ
               </button>
-              <button onClick={() => blocker.proceed?.()}
+              <button onClick={() => blocker.proceed()}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium">
                 ออกจากหน้านี้
               </button>
