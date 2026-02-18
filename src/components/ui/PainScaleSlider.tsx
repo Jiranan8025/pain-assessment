@@ -1,0 +1,74 @@
+interface PainScaleSliderProps {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  leftLabel?: string;
+  rightLabel?: string;
+}
+
+export default function PainScaleSlider({
+  label,
+  value,
+  onChange,
+  min = 0,
+  max = 10,
+  leftLabel = 'ไม่มีอาการปวด',
+  rightLabel = 'ปวดมากที่สุด',
+}: PainScaleSliderProps) {
+  const percentage = ((value - min) / (max - min)) * 100;
+
+  function getColor(pct: number): string {
+    if (pct <= 30) return '#22c55e';
+    if (pct <= 60) return '#eab308';
+    if (pct <= 80) return '#f97316';
+    return '#ef4444';
+  }
+
+  return (
+    <div className="mb-3">
+      <div className="flex items-baseline justify-between gap-2 mb-1">
+        <label className="text-sm font-semibold text-gray-700 leading-snug">{label}</label>
+        <span
+          className="text-lg font-bold shrink-0 min-w-[2.5rem] text-right"
+          style={{ color: getColor(percentage) }}
+        >
+          {value}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={e => onChange(Number(e.target.value))}
+        className="w-full h-3 rounded-lg appearance-none cursor-pointer"
+        style={{
+          background: `linear-gradient(to right, ${getColor(percentage)} ${percentage}%, #e5e7eb ${percentage}%)`,
+        }}
+      />
+      <div className="flex justify-between mt-1">
+        {Array.from({ length: max - min + 1 }, (_, i) => i + min).map(n => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => onChange(n)}
+            className={`flex-1 mx-[1px] h-6 text-[10px] rounded font-bold transition-all ${
+              value === n
+                ? 'text-white shadow-sm'
+                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+            }`}
+            style={value === n ? { backgroundColor: getColor(percentage) } : undefined}
+          >
+            {n}
+          </button>
+        ))}
+      </div>
+      <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
+        <span>{leftLabel}</span>
+        <span>{rightLabel}</span>
+      </div>
+    </div>
+  );
+}
