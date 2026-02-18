@@ -93,7 +93,7 @@ const AssessmentSummary = forwardRef<HTMLDivElement, Props>(({ assessment, patie
               PAIN ASSESSMENT REPORT
             </h1>
             <p className="text-[10px] text-gray-600 mt-0.5">
-              แผนกระงับปวด คณะแพทยศาสตร์ศิริราชพยาบาล โรงพยาบาลศิริราช
+              แผนกระงับปวด โรงพยาบาลศิริราช
             </p>
           </div>
           <div className="text-right text-[9px] text-gray-600">
