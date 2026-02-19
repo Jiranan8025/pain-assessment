@@ -6,6 +6,7 @@ import { showError, showSuccess } from '../lib/toast';
 import { exportAssessmentsToCSV } from '../lib/export';
 import { getDepressionSeverity, getAnxietySeverity, getStressSeverity } from '../lib/scoring';
 import QRCode from '../components/ui/QRCode';
+import OnboardingTour from '../components/ui/OnboardingTour';
 import { formatThaiDate } from '../lib/dateUtils';
 
 export default function PatientListPage() {
@@ -26,6 +27,7 @@ export default function PatientListPage() {
   const [editHN, setEditHN] = useState('');
   const [editName, setEditName] = useState('');
   const [editSaving, setEditSaving] = useState(false);
+  const [showTour, setShowTour] = useState(() => !localStorage.getItem('pain_tour_done'));
 
   const formLink = `${window.location.origin}/form`;
 
@@ -199,24 +201,34 @@ export default function PatientListPage() {
         <h1 className="text-xl sm:text-2xl font-bold text-primary">Pain Assessment</h1>
         <div className="flex gap-1.5 sm:gap-2">
           <button
-            onClick={() => setShowQR(!showQR)}
-            className="px-2.5 sm:px-3 py-2 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg hover:bg-purple-100 text-xs sm:text-sm font-medium"
-            title="แสดง QR Code"
+            onClick={() => { setShowTour(true); }}
+            className="px-2.5 sm:px-3 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 text-xs sm:text-sm font-medium"
+            title="คู่มือการใช้งาน"
           >
-            QR
+            📖 คู่มือ
           </button>
-          <button
-            onClick={copyFormLink}
-            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-all shadow-sm ${
-              linkCopied
-                ? 'bg-green-100 text-green-700 border border-green-300'
-                : 'bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100'
-            }`}
-          >
-            {linkCopied ? '✓ คัดลอกแล้ว!' : 'คัดลอกลิงค์'}
-          </button>
+          <div data-tour="share-buttons" className="flex gap-1.5 sm:gap-2">
+            <button
+              onClick={() => setShowQR(!showQR)}
+              className="px-2.5 sm:px-3 py-2 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg hover:bg-purple-100 text-xs sm:text-sm font-medium"
+              title="แสดง QR Code"
+            >
+              QR
+            </button>
+            <button
+              onClick={copyFormLink}
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-all shadow-sm ${
+                linkCopied
+                  ? 'bg-green-100 text-green-700 border border-green-300'
+                  : 'bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100'
+              }`}
+            >
+              {linkCopied ? '✓ คัดลอกแล้ว!' : 'คัดลอกลิงค์'}
+            </button>
+          </div>
           <Link
             to="/new"
+            data-tour="new-assessment"
             className="px-3 sm:px-5 py-2 bg-primary text-white rounded-lg hover:bg-primary-light font-semibold text-xs sm:text-sm shadow-md"
           >
             + ประเมินใหม่
@@ -246,7 +258,7 @@ export default function PatientListPage() {
       </div>
 
       {/* Search */}
-      <div className="mb-4">
+      <div className="mb-4" data-tour="search">
         <input
           type="text"
           value={search}
@@ -257,7 +269,7 @@ export default function PatientListPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-4 bg-gray-100 p-1 rounded-lg">
+      <div className="flex gap-1 mb-4 bg-gray-100 p-1 rounded-lg" data-tour="tabs">
         {[
           { key: 'dashboard' as const, label: 'Dashboard' },
           { key: 'recent' as const, label: `ประเมินล่าสุด (${filteredAssessments.length})` },
@@ -291,7 +303,7 @@ export default function PatientListPage() {
           )}
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3" data-tour="stats">
             <div className="bg-white p-3 sm:p-4 rounded-xl border border-gray-200 text-center shadow-sm">
               <p className="text-2xl sm:text-3xl font-bold text-primary">{patients.length}</p>
               <p className="text-[10px] sm:text-xs text-gray-500 mt-1">ผู้ป่วยทั้งหมด</p>
@@ -540,10 +552,10 @@ export default function PatientListPage() {
             filteredPatients.length === 0 ? (
               <p className="text-center py-8 text-gray-500">ไม่พบข้อมูล</p>
             ) : (
-              filteredPatients.map(p => (
+              filteredPatients.map((p, idx) => (
                 <div key={p.id} className="p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all">
                   <div className="flex items-center justify-between gap-2">
-                    <Link to={`/patient/${p.id}`} className="flex-1 min-w-0">
+                    <Link to={`/patient/${p.id}`} className="flex-1 min-w-0" {...(idx === 0 ? { 'data-tour': 'patient-link' } : {})}>
                       <span className="font-bold text-primary text-sm">{p.hn}</span>
                       <span className="ml-2 text-gray-700 text-sm truncate">{p.full_name}</span>
                     </Link>
@@ -659,6 +671,16 @@ export default function PatientListPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Onboarding Tour */}
+      {showTour && !loading && (
+        <OnboardingTour
+          onComplete={() => {
+            setShowTour(false);
+            localStorage.setItem('pain_tour_done', 'true');
+          }}
+        />
       )}
 
       {/* Edit Patient Dialog */}
