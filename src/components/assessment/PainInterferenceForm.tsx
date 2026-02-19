@@ -36,6 +36,7 @@ export default function PainInterferenceForm({ data, onChange }: Props) {
         onChange={v => onChange({ treatment_relief_score: v })}
         leftLabel="ไม่ช่วยบรรเทาเลย"
         rightLabel="บำบัดได้อย่างมีประสิทธิภาพที่สุด"
+        hideEmoji
       />
 
       <div className="border-t pt-4">

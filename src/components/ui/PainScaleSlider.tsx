@@ -6,6 +6,7 @@ interface PainScaleSliderProps {
   max?: number;
   leftLabel?: string;
   rightLabel?: string;
+  hideEmoji?: boolean;
 }
 
 export default function PainScaleSlider({
@@ -16,6 +17,7 @@ export default function PainScaleSlider({
   max = 10,
   leftLabel = 'ไม่มีอาการปวด',
   rightLabel = 'ปวดมากที่สุด',
+  hideEmoji = false,
 }: PainScaleSliderProps) {
   const percentage = ((value - min) / (max - min)) * 100;
 
@@ -51,13 +53,15 @@ export default function PainScaleSlider({
       <div className="flex items-center justify-between gap-2 mb-1">
         <label className="text-sm font-semibold text-gray-700 leading-snug">{label}</label>
         <div className="flex items-center gap-1 shrink-0">
-          <span
-            key={value}
-            className="inline-block text-2xl animate-bounce-once"
-            style={{ animationDuration: '0.4s' }}
-          >
-            {getEmoji(percentage)}
-          </span>
+          {!hideEmoji && (
+            <span
+              key={value}
+              className="inline-block text-2xl animate-bounce-once"
+              style={{ animationDuration: '0.4s' }}
+            >
+              {getEmoji(percentage)}
+            </span>
+          )}
           <span
             className="text-lg font-bold min-w-[2.5rem] text-right"
             style={{ color: getColor(percentage) }}

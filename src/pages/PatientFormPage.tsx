@@ -271,7 +271,7 @@ export default function PatientFormPage() {
             <PainScaleSlider label="ระดับปวดโดยเฉลี่ย" value={data.pain_score_avg} onChange={v => update({ pain_score_avg: v })} />
             <PainScaleSlider label="ระดับปวดในขณะนี้" value={data.pain_score_now} onChange={v => update({ pain_score_now: v })} />
             <PainScaleSlider label="วิธีบำบัดที่ใช้ช่วยบรรเทาปวดได้แค่ไหน" value={data.treatment_relief_score} onChange={v => update({ treatment_relief_score: v })}
-              leftLabel="ไม่ช่วยเลย" rightLabel="ช่วยได้มากที่สุด" />
+              leftLabel="ไม่ช่วยเลย" rightLabel="ช่วยได้มากที่สุด" hideEmoji />
           </div>
         )}
 
