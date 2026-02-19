@@ -106,7 +106,7 @@ const AssessmentSummary = forwardRef<HTMLDivElement, Props>(({ assessment, patie
         {/* ===== PATIENT INFORMATION ===== */}
         <div className="border border-gray-400 mb-3">
           <SectionHeader>Patient Information</SectionHeader>
-          <div className="grid grid-cols-2 print:grid-cols-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2">
             <div className="px-2 py-1.5 border-b border-r border-gray-300">
               <span className="text-gray-500">HN:</span>{' '}
               <span className="font-bold text-gray-900">{patient.hn}</span>
