@@ -5,6 +5,7 @@ import { getPatientById, getAssessmentsByPatient } from '../lib/supabase';
 import { calculateEq5dUtility } from '../lib/scoring';
 import { showError } from '../lib/toast';
 import TrendChart from '../components/ui/TrendChart';
+import OnboardingTour, { HISTORY_TOUR_STEPS } from '../components/ui/OnboardingTour';
 import { formatThaiDate, formatShortDate } from '../lib/dateUtils';
 import AssessmentCompare from '../components/summary/AssessmentCompare';
 
@@ -17,6 +18,7 @@ export default function AssessmentHistoryPage() {
   const [compareMode, setCompareMode] = useState(false);
   const [compareSelected, setCompareSelected] = useState<string[]>([]);
   const [showCompare, setShowCompare] = useState(false);
+  const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
     if (!patientId) return;
@@ -37,6 +39,24 @@ export default function AssessmentHistoryPage() {
       }
     })();
   }, [patientId]);
+
+  // ── Cross-page tour: read localStorage bridge ──
+  useEffect(() => {
+    if (loading) return;
+    try {
+      const raw = localStorage.getItem('pain_tour_state');
+      if (!raw) return;
+      const state = JSON.parse(raw);
+      if (
+        state.phase === 'history-page' &&
+        state.patientId === patientId &&
+        Date.now() - state.startedAt < 5 * 60 * 1000 // within 5 min
+      ) {
+        localStorage.removeItem('pain_tour_state');
+        setShowTour(true);
+      }
+    } catch { /* ignore */ }
+  }, [loading, patientId]);
 
   const visitLabel: Record<string, string> = {
     new_consult: 'New Consult',
@@ -121,6 +141,7 @@ export default function AssessmentHistoryPage() {
       {assessments.length >= 2 && (
         <div className="mb-6">
           <button
+            data-tour="history-chart-toggle"
             onClick={() => setShowChart(!showChart)}
             className="text-sm font-medium text-blue-600 hover:underline mb-2"
           >
@@ -175,6 +196,7 @@ export default function AssessmentHistoryPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <button
+                  data-tour="history-compare-btn"
                   onClick={() => { setCompareMode(!compareMode); setCompareSelected([]); }}
                   className={`text-sm font-medium px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
                     compareMode
@@ -265,6 +287,27 @@ export default function AssessmentHistoryPage() {
           onClose={() => setShowCompare(false)}
         />
       )}
+
+      {/* Cross-page Onboarding Tour (steps 7-9) */}
+      {showTour && (() => {
+        // Filter steps based on whether chart/compare are visible
+        const hasCharts = assessments.length >= 2;
+        const filteredSteps = hasCharts
+          ? HISTORY_TOUR_STEPS
+          : HISTORY_TOUR_STEPS.filter(s => !s.target); // only show "tips" step
+        const stepsBeforeHistory = hasCharts ? 6 : 6;
+        return (
+          <OnboardingTour
+            steps={filteredSteps}
+            totalSteps={stepsBeforeHistory + filteredSteps.length}
+            startIndex={stepsBeforeHistory}
+            onComplete={() => {
+              setShowTour(false);
+              localStorage.setItem('pain_tour_done', 'true');
+            }}
+          />
+        );
+      })()}
     </div>
   );
 }

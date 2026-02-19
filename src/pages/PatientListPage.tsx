@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { Patient, Assessment } from '../lib/types';
 import { getPatients, getAllAssessments, cleanupOldAssessments, dischargePatient, undischargePatient, deletePatient, updatePatient } from '../lib/supabase';
 import { showError, showSuccess } from '../lib/toast';
@@ -10,6 +10,7 @@ import OnboardingTour from '../components/ui/OnboardingTour';
 import { formatThaiDate } from '../lib/dateUtils';
 
 export default function PatientListPage() {
+  const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [assessments, setAssessments] = useState<(Assessment & { patient?: Patient })[]>([]);
   const [search, setSearch] = useState('');
@@ -682,6 +683,12 @@ export default function PatientListPage() {
             localStorage.setItem('pain_tour_done', 'true');
           }}
           onSwitchTab={(t) => setTab(t)}
+          firstPatientId={patients.length > 0 ? patients[0].id ?? null : null}
+          onNavigateToPatient={(patientId) => {
+            setShowTour(false);
+            navigate(`/patient/${patientId}`);
+          }}
+          totalSteps={9}
         />
       )}
 

@@ -1,63 +1,100 @@
 import { useState, useEffect, useCallback } from 'react';
 
-interface TourStep {
+export interface TourStep {
   target: string | null;
   title: string;
   description: string;
   switchTab?: 'dashboard' | 'recent' | 'patients';
+  navigateAction?: boolean;
 }
 
-const STEPS: TourStep[] = [
+const PATIENT_LIST_STEPS: TourStep[] = [
   {
     target: 'share-buttons',
-    title: '\📲 \แ\ช\ร\์\ล\ิ\ง\ก\์\ใ\ห\้\ค\น\ไ\ข\้',
-    description: '\ก\ด QR \เ\พ\ื\่\อ\แ\ส\ด\ง QR Code \ใ\ห\้\ค\น\ไ\ข\้\ส\แ\ก\น\ด\้\ว\ย\ม\ื\อ\ถ\ื\อ\n\ห\ร\ื\อ\ก\ด \ค\ั\ด\ล\อ\ก\ล\ิ\ง\ค\์ \แ\ล\้\ว\ส\่\ง\ท\า\ง LINE \ใ\ห\้\ค\น\ไ\ข\้\ก\ร\อ\ก\แ\บ\บ\ฟ\อ\ร\์\ม\เ\อ\ง\ไ\ด\้\เ\ล\ย',
+    title: '📲 แชร์ลิงก์ให้คนไข้',
+    description: 'กด QR เพื่อแสดง QR Code ให้คนไข้สแกนด้วยมือถือ\nหรือกด คัดลอกลิงค์ แล้วส่งทาง LINE ให้คนไข้กรอกแบบฟอร์มเองได้เลย',
   },
   {
     target: 'new-assessment',
-    title: '\✏\️ \ส\ร\้\า\ง\แ\บ\บ\ป\ร\ะ\เ\ม\ิ\น\ใ\ห\ม\่',
-    description: '\ก\ด\ท\ี\่\น\ี\่\เ\พ\ื\่\อ\เ\ร\ิ\่\ม\ก\ร\อ\ก\แ\บ\บ\ป\ร\ะ\เ\ม\ิ\น\ใ\ห\้\ค\น\ไ\ข\้\n\เ\ล\ื\อ\ก\ป\ร\ะ\เ\ภ\ท\ก\า\ร\ม\า: New Consult, Follow-up,\nPre-procedure \ห\ร\ื\อ Post-procedure',
+    title: '✏️ สร้างแบบประเมินใหม่',
+    description: 'กดที่นี่เพื่อเริ่มกรอกแบบประเมินให้คนไข้\nเลือกประเภทการมา: New Consult, Follow-up,\nPre-procedure หรือ Post-procedure',
   },
   {
     target: 'tabs',
-    title: '\📊 \เ\ม\น\ู\ห\ล\ั\ก 3 \แ\ท\็\บ',
-    description: '\• Dashboard = \ด\ู\ส\ถ\ิ\ต\ิ\ร\ว\ม \ก\ร\า\ฟ \แ\ล\ะ\แ\จ\้\ง\เ\ต\ื\อ\น\n\• \ป\ร\ะ\เ\ม\ิ\น\ล\่\า\ส\ุ\ด = \ค\้\น\ห\า\ผ\ล\ป\ร\ะ\เ\ม\ิ\น\ต\า\ม\ว\ั\น\ท\ี\่\n\• \ผ\ู\้\ป\่\ว\ย = \ด\ู\ร\า\ย\ช\ื\่\อ \แ\ก\้\ไ\ข \ย\ุ\ต\ิ\ก\า\ร\ร\ั\ก\ษ\า \ห\ร\ื\อ\ล\บ',
+    title: '📊 เมนูหลัก 3 แท็บ',
+    description: '• Dashboard = ดูสถิติรวม กราฟ และแจ้งเตือน\n• ประเมินล่าสุด = ค้นหาผลประเมินตามวันที่\n• ผู้ป่วย = ดูรายชื่อ แก้ไข ยุติการรักษา หรือลบ',
   },
   {
     target: 'search',
-    title: '\🔍 \ค\้\น\ห\า\ผ\ู\้\ป\่\ว\ย',
-    description: '\พ\ิ\ม\พ\์ HN \ห\ร\ื\อ\ช\ื\่\อ-\ส\ก\ุ\ล\เ\พ\ื\่\อ\ค\้\น\ห\า\ผ\ู\้\ป\่\ว\ย\ไ\ด\้\เ\ล\ย\n\ใ\ช\้\ไ\ด\้\ท\ุ\ก\แ\ท\็\บ',
+    title: '🔍 ค้นหาผู้ป่วย',
+    description: 'พิมพ์ HN หรือชื่อ-สกุลเพื่อค้นหาผู้ป่วยได้เลย\nใช้ได้ทุกแท็บ',
   },
   {
     target: 'stats',
-    title: '\📈 \ส\ถ\ิ\ต\ิ\ภ\า\พ\ร\ว\ม',
-    description: '\ด\ู\จ\ำ\น\ว\น\ผ\ู\้\ป\่\ว\ย \ป\ร\ะ\เ\ม\ิ\น\ว\ั\น\น\ี\้ Pain Now \เ\ฉ\ล\ี\่\ย\n\แ\ล\ะ EQ-VAS \เ\ฉ\ล\ี\่\ย\n\ด\้\า\น\ล\่\า\ง\ม\ี\แ\จ\้\ง\เ\ต\ื\อ\น Suicide Risk \แ\ล\ะ\ผ\ู\้\ป\่\ว\ย\ท\ี\่\ต\้\อ\ง\ด\ู\แ\ล',
+    title: '📈 สถิติภาพรวม',
+    description: 'ดูจำนวนผู้ป่วย ประเมินวันนี้ Pain Now เฉลี่ย\nและ EQ-VAS เฉลี่ย\nด้านล่างมีแจ้งเตือน Suicide Risk และผู้ป่วยที่ต้องดูแล',
     switchTab: 'dashboard',
   },
   {
     target: 'patient-link',
-    title: '\📋 \ด\ู\ป\ร\ะ\ว\ั\ต\ิ \ก\ร\า\ฟ \เ\ป\ร\ี\ย\บ\เ\ท\ี\ย\บ',
-    description: '\ก\ด\ท\ี\่\ช\ื\่\อ\ผ\ู\้\ป\่\ว\ย\เ\พ\ื\่\อ\เ\ข\้\า\ด\ู:\n\• \ป\ร\ะ\ว\ั\ต\ิ\ก\า\ร\ป\ร\ะ\เ\ม\ิ\น\ท\ั\้\ง\ห\ม\ด\n\• \ก\ร\า\ฟ\แ\น\ว\โ\น\้\ม\ค\ว\า\ม\ป\ว\ด\n\• \เ\ป\ร\ี\ย\บ\เ\ท\ี\ย\บ\ผ\ล\ร\ะ\ห\ว\่\า\ง\ค\ร\ั\้\ง\ไ\ด\้',
+    title: '📋 ดูประวัติ กราฟ เปรียบเทียบ',
+    description: 'กดที่ชื่อผู้ป่วยเพื่อเข้าดู:\n• ประวัติการประเมินทั้งหมด\n• กราฟแนวโน้มความปวด\n• เปรียบเทียบผลระหว่างครั้งได้',
     switchTab: 'patients',
+    navigateAction: true,
   },
   {
     target: null,
-    title: '\💡 \ส\ิ\่\ง\ท\ี\่\ค\ว\ร\ร\ู\้',
-    description: '\• \ก\ด Export CSV \เ\พ\ื\่\อ\ด\า\ว\น\์\โ\ห\ล\ด\ข\้\อ\ม\ู\ล\ท\ั\้\ง\ห\ม\ด\เ\ป\็\น\ไ\ฟ\ล\์ Excel\n\• \ข\้\อ\ม\ู\ล\เ\ก\่\า\ก\ว\่\า 30 \ว\ั\น\จ\ะ\ถ\ู\ก\ล\บ\อ\ั\ต\โ\น\ม\ั\ต\ิ\n\• \อ\ย\า\ก\ด\ู\ค\ำ\แ\น\ะ\น\ำ\อ\ี\ก\ค\ร\ั\้\ง \ก\ด\ป\ุ\่\ม "\📖 \ค\ู\่\ม\ื\อ" \ด\้\า\น\บ\น\ไ\ด\้\เ\ล\ย',
+    title: '💡 สิ่งที่ควรรู้',
+    description: '• กด Export CSV เพื่อดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ Excel\n• ข้อมูลเก่ากว่า 30 วันจะถูกลบอัตโนมัติ\n• อยากดูคำแนะนำอีกครั้ง กดปุ่ม "📖 คู่มือ" ด้านบนได้เลย',
     switchTab: 'dashboard',
+  },
+];
+
+export { PATIENT_LIST_STEPS };
+
+export const HISTORY_TOUR_STEPS: TourStep[] = [
+  {
+    target: 'history-chart-toggle',
+    title: '📈 กราฟแนวโน้มความปวด',
+    description: 'กดที่นี่เพื่อเปิด'+'/'+'ปิดกราฟแนวโน้ม\nดู Pain Score, EQ-5D, DASS-21\nเปรียบเทียบข้ามครั้งได้ในกราฟเดียว',
+  },
+  {
+    target: 'history-compare-btn',
+    title: '⚖️ เปรียบเทียบผลประเมิน',
+    description: 'กดเพื่อเข้าโหมดเปรียบเทียบ\nเลือก 2 ครั้งที่ต้องการเทียบ\nจะเห็นตารางเทียบแบบ Side-by-Side',
+  },
+  {
+    target: null,
+    title: '💡 สิ่งที่ควรรู้',
+    description: '• กด Export CSV เพื่อดาวน์โหลดข้อมูลทั้งหมดเป็นไฟล์ Excel\n• ข้อมูลเก่ากว่า 30 วันจะถูกลบอัตโนมัติ\n• อยากดูคำแนะนำอีกครั้ง กดปุ่ม "📖 คู่มือ" ที่หน้าหลักได้เลย',
   },
 ];
 
 interface Props {
   onComplete: () => void;
   onSwitchTab?: (tab: 'dashboard' | 'recent' | 'patients') => void;
+  onNavigateToPatient?: (patientId: string) => void;
+  firstPatientId?: string | null;
+  steps?: TourStep[];
+  totalSteps?: number;
+  startIndex?: number;
 }
 
-export default function OnboardingTour({ onComplete, onSwitchTab }: Props) {
+export default function OnboardingTour({
+  onComplete,
+  onSwitchTab,
+  onNavigateToPatient,
+  firstPatientId,
+  steps: externalSteps,
+  totalSteps: externalTotalSteps,
+  startIndex = 0,
+}: Props) {
   const [step, setStep] = useState(0);
   const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null);
 
-  const currentStep = STEPS[step];
+  const activeSteps = externalSteps ?? PATIENT_LIST_STEPS;
+  const totalSteps = externalTotalSteps ?? activeSteps.length;
+  const currentStep = activeSteps[step];
 
   const updateSpotlight = useCallback(() => {
     if (!currentStep.target) {
@@ -73,15 +110,11 @@ export default function OnboardingTour({ onComplete, onSwitchTab }: Props) {
   }, [currentStep.target]);
 
   useEffect(() => {
-    // Switch tab if needed for this step
     if (currentStep.switchTab && onSwitchTab) {
       onSwitchTab(currentStep.switchTab);
     }
-
-    // Small delay to let tab switch render, then measure
     const timer = setTimeout(() => {
       updateSpotlight();
-
       if (currentStep.target) {
         const el = document.querySelector(`[data-tour="${currentStep.target}"]`);
         if (el) {
@@ -90,7 +123,6 @@ export default function OnboardingTour({ onComplete, onSwitchTab }: Props) {
         }
       }
     }, 100);
-
     window.addEventListener('resize', updateSpotlight);
     return () => {
       clearTimeout(timer);
@@ -98,8 +130,19 @@ export default function OnboardingTour({ onComplete, onSwitchTab }: Props) {
     };
   }, [step, currentStep.target, currentStep.switchTab, onSwitchTab, updateSpotlight]);
 
+  const handleNavigate = () => {
+    if (onNavigateToPatient && firstPatientId) {
+      localStorage.setItem('pain_tour_state', JSON.stringify({
+        phase: 'history-page',
+        patientId: firstPatientId,
+        startedAt: Date.now(),
+      }));
+      onNavigateToPatient(firstPatientId);
+    }
+  };
+
   const handleNext = () => {
-    if (step < STEPS.length - 1) {
+    if (step < activeSteps.length - 1) {
       setStep(step + 1);
     } else {
       onComplete();
@@ -110,41 +153,24 @@ export default function OnboardingTour({ onComplete, onSwitchTab }: Props) {
     onComplete();
   };
 
+  const isNavigateStep = currentStep.navigateAction && firstPatientId && onNavigateToPatient;
+  const isLastStep = step >= activeSteps.length - 1;
+
   const getTooltipStyle = (): React.CSSProperties => {
     if (!spotlightRect) {
-      return {
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        maxWidth: '340px',
-        width: '90vw',
-      };
+      return { position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: '340px', width: '90vw' };
     }
-
     const padding = 12;
     const tooltipWidth = 320;
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
     let top = spotlightRect.bottom + padding;
     let left = spotlightRect.left + spotlightRect.width / 2 - tooltipWidth / 2;
-
-    if (top + 220 > viewportHeight) {
-      top = spotlightRect.top - padding - 220;
-    }
-
+    if (top + 220 > vh) top = spotlightRect.top - padding - 220;
     if (left < 12) left = 12;
-    if (left + tooltipWidth > viewportWidth - 12) left = viewportWidth - 12 - tooltipWidth;
+    if (left + tooltipWidth > vw - 12) left = vw - 12 - tooltipWidth;
     if (top < 12) top = 12;
-
-    return {
-      position: 'fixed',
-      top: `${top}px`,
-      left: `${left}px`,
-      maxWidth: `${tooltipWidth}px`,
-      width: '90vw',
-    };
+    return { position: 'fixed', top: `${top}px`, left: `${left}px`, maxWidth: `${tooltipWidth}px`, width: '90vw' };
   };
 
   const getSpotlightStyle = (): React.CSSProperties => {
@@ -165,56 +191,43 @@ export default function OnboardingTour({ onComplete, onSwitchTab }: Props) {
 
   return (
     <div className="fixed inset-0 z-[9997]">
-      {!spotlightRect && (
-        <div className="fixed inset-0 bg-black/55 z-[9998]" />
-      )}
-
+      {!spotlightRect && <div className="fixed inset-0 bg-black/55 z-[9998]" />}
       {spotlightRect && <div style={getSpotlightStyle()} />}
-
       {spotlightRect && (
         <div className="fixed inset-0 z-[9998]" style={{ pointerEvents: 'auto' }} onClick={e => e.stopPropagation()} />
       )}
-
-      <div
-        style={{ ...getTooltipStyle(), zIndex: 9999 }}
-        className="bg-white rounded-xl shadow-2xl p-5 animate-fade-in"
-      >
+      <div style={{ ...getTooltipStyle(), zIndex: 9999 }} className="bg-white rounded-xl shadow-2xl p-5 animate-fade-in">
         <h3 className="text-base font-bold text-gray-900 mb-2">{currentStep.title}</h3>
         <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{currentStep.description}</p>
-
         <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
           <div className="flex gap-1.5">
-            {STEPS.map((_, i) => (
+            {Array.from({ length: totalSteps }, (_, i) => (
               <div
                 key={i}
                 className={`w-2 h-2 rounded-full transition-all ${
-                  i === step ? 'bg-primary scale-125' : i < step ? 'bg-primary/40' : 'bg-gray-200'
+                  i === startIndex + step ? 'bg-primary scale-125' : i < startIndex + step ? 'bg-primary/40' : 'bg-gray-200'
                 }`}
               />
             ))}
           </div>
-
           <div className="flex gap-2">
-            {step < STEPS.length - 1 && (
-              <button
-                onClick={handleSkip}
-                className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                {'\ข\้\า\ม \✕'}
+            {!isLastStep && (
+              <button onClick={handleSkip} className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                ข้าม ✕
               </button>
             )}
-            <button
-              onClick={handleNext}
-              className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary-light shadow-sm transition-all"
-            >
-              {step < STEPS.length - 1
-                ? '\ถ\ั\ด\ไ\ป \→'
-                : '\เ\ร\ิ\่\ม\ใ\ช\้\ง\า\น \✓'}
-            </button>
+            {isNavigateStep ? (
+              <button onClick={handleNavigate} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 shadow-sm transition-all">
+                กดที่ชื่อผู้ป่วยเลย →
+              </button>
+            ) : (
+              <button onClick={handleNext} className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary-light shadow-sm transition-all">
+                {isLastStep ? 'เริ่มใช้งาน ✓' : 'ถัดไป →'}
+              </button>
+            )}
           </div>
         </div>
-
-        <p className="text-[10px] text-gray-300 text-center mt-2">{step + 1} / {STEPS.length}</p>
+        <p className="text-[10px] text-gray-300 text-center mt-2">{startIndex + step + 1} / {totalSteps}</p>
       </div>
     </div>
   );
