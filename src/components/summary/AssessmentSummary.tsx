@@ -106,7 +106,7 @@ const AssessmentSummary = forwardRef<HTMLDivElement, Props>(({ assessment, patie
         {/* ===== PATIENT INFORMATION ===== */}
         <div className="border border-gray-400 mb-3">
           <SectionHeader>Patient Information</SectionHeader>
-          <div className="grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2">
+          <div className="grid grid-cols-2">
             <div className="px-2 py-1.5 border-b border-r border-gray-300">
               <span className="text-gray-500">HN:</span>{' '}
               <span className="font-bold text-gray-900">{patient.hn}</span>
@@ -129,13 +129,13 @@ const AssessmentSummary = forwardRef<HTMLDivElement, Props>(({ assessment, patie
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {/* ===== LEFT COLUMN ===== */}
           <div className="space-y-3">
             {/* BPI Section */}
             <div className="border border-gray-400">
               <SectionHeader>Brief Pain Inventory (BPI)</SectionHeader>
-              <div className="p-2 flex flex-col sm:flex-row gap-3">
+              <div className="p-2 flex gap-3">
                 <div className="shrink-0">
                   <BodyMap locations={assessment.pain_location_data} onChange={() => {}} readonly compact />
                 </div>

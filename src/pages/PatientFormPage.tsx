@@ -315,7 +315,7 @@ export default function PatientFormPage() {
               <input type="range" min={0} max={100} value={data.eq5d_vas}
                 onChange={e => update({ eq5d_vas: Number(e.target.value) })}
                 className="w-full h-4 rounded-lg appearance-none cursor-pointer"
-                style={{ background: `linear-gradient(to right, #ef4444 0%, #eab308 30%, #22c55e 70%, #22c55e ${data.eq5d_vas}%, #e5e7eb ${data.eq5d_vas}%)` }} />
+                style={{ background: data.eq5d_vas === 0 ? '#e5e7eb' : `linear-gradient(to right, #ef4444 0%, #eab308 ${Math.min(30, data.eq5d_vas)}%, #22c55e ${Math.min(70, data.eq5d_vas)}%, #22c55e ${data.eq5d_vas}%, #e5e7eb ${data.eq5d_vas}%)` }} />
               <div className="text-center mt-2">
                 <span className="text-4xl font-bold text-primary">{data.eq5d_vas}</span>
                 <span className="text-gray-500"> / 100</span>

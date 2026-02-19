@@ -26,6 +26,18 @@ export default function PainScaleSlider({
     return '#ef4444';
   }
 
+  // สร้าง gradient ไล่สีเขียว→เหลือง→ส้ม→แดง จนถึงจุดที่เลือก แล้วเป็นเทา
+  function getTrackGradient(): string {
+    if (percentage === 0) return '#e5e7eb';
+    // color stops ตามสัดส่วนของ filled area
+    const stops: string[] = ['#22c55e 0%'];
+    if (percentage > 30) stops.push(`#eab308 ${(30 / percentage) * 100}%`);
+    if (percentage > 60) stops.push(`#f97316 ${(60 / percentage) * 100}%`);
+    if (percentage > 80) stops.push(`#ef4444 ${(80 / percentage) * 100}%`);
+    stops.push(`${getColor(percentage)} 100%`);
+    return `linear-gradient(to right, ${stops.join(', ')} ) 0% 0% / ${percentage}% 100% no-repeat, #e5e7eb`;
+  }
+
   return (
     <div className="mb-5">
       <div className="flex items-baseline justify-between gap-2 mb-1">
@@ -45,7 +57,7 @@ export default function PainScaleSlider({
         onChange={e => onChange(Number(e.target.value))}
         className="w-full h-3 rounded-lg appearance-none cursor-pointer"
         style={{
-          background: `linear-gradient(to right, ${getColor(percentage)} ${percentage}%, #e5e7eb ${percentage}%)`,
+          background: getTrackGradient(),
           touchAction: 'manipulation',
         }}
       />
@@ -60,7 +72,7 @@ export default function PainScaleSlider({
                 ? 'text-white shadow-sm'
                 : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
             }`}
-            style={value === n ? { backgroundColor: getColor(percentage) } : undefined}
+            style={value === n ? { backgroundColor: getColor(((n - min) / (max - min)) * 100) } : undefined}
           >
             {n}
           </button>
