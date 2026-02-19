@@ -27,7 +27,7 @@ export default function PainScaleSlider({
   }
 
   return (
-    <div className="mb-3">
+    <div className="mb-5">
       <div className="flex items-baseline justify-between gap-2 mb-1">
         <label className="text-sm font-semibold text-gray-700 leading-snug">{label}</label>
         <span
@@ -46,6 +46,7 @@ export default function PainScaleSlider({
         className="w-full h-3 rounded-lg appearance-none cursor-pointer"
         style={{
           background: `linear-gradient(to right, ${getColor(percentage)} ${percentage}%, #e5e7eb ${percentage}%)`,
+          touchAction: 'manipulation',
         }}
       />
       <div className="flex justify-between mt-1">
@@ -54,7 +55,7 @@ export default function PainScaleSlider({
             key={n}
             type="button"
             onClick={() => onChange(n)}
-            className={`flex-1 mx-[1px] h-6 text-[10px] rounded font-bold transition-all ${
+            className={`flex-1 mx-[1px] h-8 text-xs rounded font-bold transition-all ${
               value === n
                 ? 'text-white shadow-sm'
                 : 'bg-gray-100 text-gray-500 hover:bg-gray-200'

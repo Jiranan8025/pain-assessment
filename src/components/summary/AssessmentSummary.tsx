@@ -129,13 +129,13 @@ const AssessmentSummary = forwardRef<HTMLDivElement, Props>(({ assessment, patie
           </div>
         </div>
 
-        <div className="grid grid-cols-2 print:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 print:grid-cols-2 gap-3">
           {/* ===== LEFT COLUMN ===== */}
           <div className="space-y-3">
             {/* BPI Section */}
             <div className="border border-gray-400">
               <SectionHeader>Brief Pain Inventory (BPI)</SectionHeader>
-              <div className="p-2 flex gap-3">
+              <div className="p-2 flex flex-col sm:flex-row gap-3">
                 <div className="shrink-0">
                   <BodyMap locations={assessment.pain_location_data} onChange={() => {}} readonly compact />
                 </div>

@@ -227,8 +227,8 @@ export default function PatientFormPage() {
                 placeholder="เลข HN เช่น 66XXXXXX" />
               {hnLookupStatus === 'loading' && <p className="text-xs text-blue-500 mt-1">กำลังค้นหา...</p>}
               {hnLookupStatus === 'found' && <p className="text-xs text-green-600 mt-1">พบข้อมูล - เติมชื่อให้แล้ว</p>}
-              {hnLookupStatus === 'not_found' && <p className="text-xs text-gray-400 mt-1">กรุณากรอกเลข HN ที่ได้รับจากแผนกที่ส่งตัวมา</p>}
-              {hnLookupStatus === 'idle' && <p className="text-xs text-gray-400 mt-1">กรุณากรอกเลข HN ที่ได้รับจากแผนกที่ส่งตัวมา</p>}
+              {hnLookupStatus === 'not_found' && <p className="text-xs text-gray-400 mt-1">กรุณากรอกเลข HN</p>}
+              {hnLookupStatus === 'idle' && <p className="text-xs text-gray-400 mt-1">กรุณากรอกเลข HN</p>}
             </div>
 
             <div className="p-4 bg-gray-50 rounded-xl">
