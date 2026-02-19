@@ -678,8 +678,10 @@ export default function PatientListPage() {
         <OnboardingTour
           onComplete={() => {
             setShowTour(false);
+            setTab('dashboard');
             localStorage.setItem('pain_tour_done', 'true');
           }}
+          onSwitchTab={(t) => setTab(t)}
         />
       )}
 
