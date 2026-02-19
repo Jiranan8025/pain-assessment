@@ -5,6 +5,7 @@ import type { Assessment, Patient } from '../lib/types';
 import { getAssessmentById, getPatientById, deleteAssessment } from '../lib/supabase';
 import { showError, showSuccess } from '../lib/toast';
 import AssessmentSummary from '../components/summary/AssessmentSummary';
+import MobileSummaryCard from '../components/summary/MobileSummaryCard';
 import { formatThaiDate } from '../lib/dateUtils';
 import { exportToPdf } from '../lib/pdfExport';
 
@@ -176,9 +177,12 @@ export default function SummaryPage() {
         </div>
       )}
 
-      {/* Summary Content */}
-      <div className="flex justify-center">
-        <div className="shadow-lg">
+      {/* Summary Content — Mobile: card view, Desktop: PDF view */}
+      <div className="sm:hidden">
+        <MobileSummaryCard assessment={assessment} patient={patient} />
+      </div>
+      <div className="sm:flex sm:justify-center">
+        <div className="fixed left-[-9999px] sm:static sm:shadow-lg">
           <AssessmentSummary ref={summaryRef} assessment={assessment} patient={patient} />
         </div>
       </div>

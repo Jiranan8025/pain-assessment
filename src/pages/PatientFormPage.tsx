@@ -271,7 +271,7 @@ export default function PatientFormPage() {
             <PainScaleSlider label="ระดับปวดโดยเฉลี่ย" value={data.pain_score_avg} onChange={v => update({ pain_score_avg: v })} />
             <PainScaleSlider label="ระดับปวดในขณะนี้" value={data.pain_score_now} onChange={v => update({ pain_score_now: v })} />
             <PainScaleSlider label="วิธีบำบัดที่ใช้ช่วยบรรเทาปวดได้แค่ไหน" value={data.treatment_relief_score} onChange={v => update({ treatment_relief_score: v })}
-              leftLabel="ไม่ช่วยเลย" rightLabel="ช่วยได้มากที่สุด" hideEmoji />
+              leftLabel="ไม่ช่วยเลย" rightLabel="ช่วยได้มากที่สุด" />
           </div>
         )}
 
@@ -317,6 +317,9 @@ export default function PatientFormPage() {
                 className="w-full h-4 rounded-lg appearance-none cursor-pointer"
                 style={{ background: data.eq5d_vas === 0 ? '#e5e7eb' : `linear-gradient(to right, #ef4444 0%, #eab308 ${Math.min(30, data.eq5d_vas)}%, #22c55e ${Math.min(70, data.eq5d_vas)}%, #22c55e ${data.eq5d_vas}%, #e5e7eb ${data.eq5d_vas}%)` }} />
               <div className="text-center mt-2">
+                <span key={data.eq5d_vas} className="inline-block text-3xl animate-bounce-once mr-1">
+                  {data.eq5d_vas <= 20 ? '😰' : data.eq5d_vas <= 40 ? '😟' : data.eq5d_vas <= 60 ? '😐' : data.eq5d_vas <= 80 ? '🙂' : '😊'}
+                </span>
                 <span className="text-4xl font-bold text-primary">{data.eq5d_vas}</span>
                 <span className="text-gray-500"> / 100</span>
               </div>

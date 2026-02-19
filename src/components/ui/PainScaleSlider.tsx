@@ -6,7 +6,6 @@ interface PainScaleSliderProps {
   max?: number;
   leftLabel?: string;
   rightLabel?: string;
-  hideEmoji?: boolean;
 }
 
 export default function PainScaleSlider({
@@ -17,7 +16,6 @@ export default function PainScaleSlider({
   max = 10,
   leftLabel = 'ไม่มีอาการปวด',
   rightLabel = 'ปวดมากที่สุด',
-  hideEmoji = false,
 }: PainScaleSliderProps) {
   const percentage = ((value - min) / (max - min)) * 100;
 
@@ -26,15 +24,6 @@ export default function PainScaleSlider({
     if (pct <= 60) return '#eab308';
     if (pct <= 80) return '#f97316';
     return '#ef4444';
-  }
-
-  function getEmoji(pct: number): string {
-    if (pct === 0) return '😊';
-    if (pct <= 20) return '🙂';
-    if (pct <= 40) return '😐';
-    if (pct <= 60) return '😟';
-    if (pct <= 80) return '😣';
-    return '😭';
   }
 
   // สร้าง gradient ไล่สีเขียว→เหลือง→ส้ม→แดง จนถึงจุดที่เลือก แล้วเป็นเทา
@@ -52,23 +41,12 @@ export default function PainScaleSlider({
     <div className="mb-5">
       <div className="flex items-center justify-between gap-2 mb-1">
         <label className="text-sm font-semibold text-gray-700 leading-snug">{label}</label>
-        <div className="flex items-center gap-1 shrink-0">
-          {!hideEmoji && (
-            <span
-              key={value}
-              className="inline-block text-2xl animate-bounce-once"
-              style={{ animationDuration: '0.4s' }}
-            >
-              {getEmoji(percentage)}
-            </span>
-          )}
-          <span
-            className="text-lg font-bold min-w-[2.5rem] text-right"
-            style={{ color: getColor(percentage) }}
-          >
-            {value}
-          </span>
-        </div>
+        <span
+          className="text-lg font-bold shrink-0 min-w-[2.5rem] text-right"
+          style={{ color: getColor(percentage) }}
+        >
+          {value}
+        </span>
       </div>
       <input
         type="range"

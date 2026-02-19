@@ -82,6 +82,9 @@ export default function Eq5d5lForm({ data, onChange }: Props) {
         </div>
 
         <div className="text-center mt-3">
+          <span key={data.eq5d_vas} className="inline-block text-3xl animate-bounce-once mr-1">
+            {data.eq5d_vas <= 20 ? '😰' : data.eq5d_vas <= 40 ? '😟' : data.eq5d_vas <= 60 ? '😐' : data.eq5d_vas <= 80 ? '🙂' : '😊'}
+          </span>
           <span className="text-4xl font-bold text-primary">{data.eq5d_vas}</span>
           <span className="text-lg text-gray-500"> / 100</span>
         </div>

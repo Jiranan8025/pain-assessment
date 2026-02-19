@@ -172,27 +172,34 @@ export default function AssessmentHistoryPage() {
         <div className="space-y-3">
           {/* Compare Mode Toggle */}
           {assessments.length >= 2 && (
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => { setCompareMode(!compareMode); setCompareSelected([]); }}
-                className={`text-sm font-medium px-3 py-1.5 rounded-lg transition-all ${
-                  compareMode
-                    ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                    : 'bg-gray-100 text-gray-600 hover:text-purple-700'
-                }`}
-              >
-                {compareMode ? 'ยกเลิกเปรียบเทียบ' : 'เปรียบเทียบ 2 ครั้ง'}
-              </button>
-              {compareMode && compareSelected.length === 2 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
                 <button
-                  onClick={() => setShowCompare(true)}
-                  className="px-4 py-1.5 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700"
+                  onClick={() => { setCompareMode(!compareMode); setCompareSelected([]); }}
+                  className={`text-sm font-medium px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
+                    compareMode
+                      ? 'bg-purple-600 text-white shadow-sm'
+                      : 'border-2 border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100'
+                  }`}
                 >
-                  ดูผลเปรียบเทียบ
+                  <span>{compareMode ? '✕' : '⚖️'}</span>
+                  {compareMode ? 'ยกเลิก' : 'เปรียบเทียบผลประเมิน'}
                 </button>
-              )}
-              {compareMode && compareSelected.length < 2 && (
-                <span className="text-xs text-gray-400">เลือก {compareSelected.length}/2 รายการ</span>
+                {compareMode && compareSelected.length === 2 && (
+                  <button
+                    onClick={() => setShowCompare(true)}
+                    className="px-5 py-2 bg-purple-600 text-white rounded-lg text-sm font-bold hover:bg-purple-700 shadow-md animate-pulse"
+                  >
+                    ดูผลเปรียบเทียบ →
+                  </button>
+                )}
+              </div>
+              {compareMode && (
+                <div className="px-3 py-2 bg-purple-50 border border-purple-200 rounded-lg text-sm text-purple-700">
+                  {compareSelected.length < 2
+                    ? `👆 กดเลือก ${2 - compareSelected.length} รายการ${compareSelected.length === 0 ? '' : 'อีก'}เพื่อเปรียบเทียบ`
+                    : '✓ เลือกครบแล้ว — กด "ดูผลเปรียบเทียบ" ด้านบน'}
+                </div>
               )}
             </div>
           )}
