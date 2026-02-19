@@ -26,10 +26,18 @@ export default function PainScaleSlider({
     return '#ef4444';
   }
 
+  function getEmoji(pct: number): string {
+    if (pct === 0) return '😊';
+    if (pct <= 20) return '🙂';
+    if (pct <= 40) return '😐';
+    if (pct <= 60) return '😟';
+    if (pct <= 80) return '😣';
+    return '😭';
+  }
+
   // สร้าง gradient ไล่สีเขียว→เหลือง→ส้ม→แดง จนถึงจุดที่เลือก แล้วเป็นเทา
   function getTrackGradient(): string {
     if (percentage === 0) return '#e5e7eb';
-    // color stops ตามสัดส่วนของ filled area
     const stops: string[] = ['#22c55e 0%'];
     if (percentage > 30) stops.push(`#eab308 ${(30 / percentage) * 100}%`);
     if (percentage > 60) stops.push(`#f97316 ${(60 / percentage) * 100}%`);
@@ -40,14 +48,23 @@ export default function PainScaleSlider({
 
   return (
     <div className="mb-5">
-      <div className="flex items-baseline justify-between gap-2 mb-1">
+      <div className="flex items-center justify-between gap-2 mb-1">
         <label className="text-sm font-semibold text-gray-700 leading-snug">{label}</label>
-        <span
-          className="text-lg font-bold shrink-0 min-w-[2.5rem] text-right"
-          style={{ color: getColor(percentage) }}
-        >
-          {value}
-        </span>
+        <div className="flex items-center gap-1 shrink-0">
+          <span
+            key={value}
+            className="inline-block text-2xl animate-bounce-once"
+            style={{ animationDuration: '0.4s' }}
+          >
+            {getEmoji(percentage)}
+          </span>
+          <span
+            className="text-lg font-bold min-w-[2.5rem] text-right"
+            style={{ color: getColor(percentage) }}
+          >
+            {value}
+          </span>
+        </div>
       </div>
       <input
         type="range"

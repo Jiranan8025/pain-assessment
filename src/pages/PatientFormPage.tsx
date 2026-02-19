@@ -265,9 +265,9 @@ export default function PatientFormPage() {
             </div>
 
             <PainScaleSlider label="ระดับปวดมากที่สุดในรอบ 24 ชั่วโมง" value={data.pain_score_max}
-              onChange={v => update({ pain_score_max: v })} />
+              onChange={v => { const u: Partial<Assessment> = { pain_score_max: v }; if (v < data.pain_score_min) u.pain_score_min = v; update(u); }} />
             <PainScaleSlider label="ระดับปวดน้อยที่สุดในรอบ 24 ชั่วโมง" value={data.pain_score_min}
-              onChange={v => update({ pain_score_min: v })} />
+              onChange={v => { const u: Partial<Assessment> = { pain_score_min: v }; if (v > data.pain_score_max) u.pain_score_max = v; update(u); }} />
             <PainScaleSlider label="ระดับปวดโดยเฉลี่ย" value={data.pain_score_avg} onChange={v => update({ pain_score_avg: v })} />
             <PainScaleSlider label="ระดับปวดในขณะนี้" value={data.pain_score_now} onChange={v => update({ pain_score_now: v })} />
             <PainScaleSlider label="วิธีบำบัดที่ใช้ช่วยบรรเทาปวดได้แค่ไหน" value={data.treatment_relief_score} onChange={v => update({ treatment_relief_score: v })}

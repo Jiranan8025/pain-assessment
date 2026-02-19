@@ -75,7 +75,7 @@ export default function Eq5d5lForm({ data, onChange }: Props) {
             onChange={e => onChange({ eq5d_vas: Number(e.target.value) })}
             className="flex-1 h-4 rounded-lg appearance-none cursor-pointer"
             style={{
-              background: `linear-gradient(to right, #ef4444 0%, #eab308 30%, #22c55e 70%, #22c55e ${data.eq5d_vas}%, #e5e7eb ${data.eq5d_vas}%)`,
+              background: data.eq5d_vas === 0 ? '#e5e7eb' : `linear-gradient(to right, #ef4444 0%, #eab308 ${Math.min(30, data.eq5d_vas)}%, #22c55e ${Math.min(70, data.eq5d_vas)}%, #22c55e ${data.eq5d_vas}%, #e5e7eb ${data.eq5d_vas}%)`,
             }}
           />
           <span className="text-xs text-gray-500 w-20">ดีที่สุด (100)</span>
