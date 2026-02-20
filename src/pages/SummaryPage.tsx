@@ -6,6 +6,7 @@ import { getAssessmentById, getPatientById, deleteAssessment } from '../lib/supa
 import { showError, showSuccess } from '../lib/toast';
 import AssessmentSummary from '../components/summary/AssessmentSummary';
 import MobileSummaryCard from '../components/summary/MobileSummaryCard';
+import ProcedureEditModal from '../components/summary/ProcedureEditModal';
 import { formatThaiDate } from '../lib/dateUtils';
 import { exportToPdf } from '../lib/pdfExport';
 
@@ -25,6 +26,7 @@ export default function SummaryPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [showProcedureEdit, setShowProcedureEdit] = useState(false);
 
   useEffect(() => {
     if (assessment && patient) return;
@@ -129,6 +131,12 @@ export default function SummaryPage() {
             แก้ไข
           </Link>
           <button
+            onClick={() => setShowProcedureEdit(true)}
+            className="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 text-sm font-medium"
+          >
+            แก้ไขหัตถการ
+          </button>
+          <button
             onClick={() => setShowDeleteConfirm(true)}
             className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 text-sm font-medium"
           >
@@ -179,13 +187,22 @@ export default function SummaryPage() {
 
       {/* Summary Content — Mobile: card view, Desktop: PDF view */}
       <div className="sm:hidden">
-        <MobileSummaryCard assessment={assessment} patient={patient} />
+        <MobileSummaryCard assessment={assessment} patient={patient} onEditProcedure={() => setShowProcedureEdit(true)} />
       </div>
       <div className="sm:flex sm:justify-center">
         <div className="fixed left-[-9999px] sm:static sm:shadow-lg">
           <AssessmentSummary ref={summaryRef} assessment={assessment} patient={patient} />
         </div>
       </div>
+
+      {/* Procedure Edit Modal */}
+      {showProcedureEdit && (
+        <ProcedureEditModal
+          assessment={assessment}
+          onClose={() => setShowProcedureEdit(false)}
+          onSaved={(updated) => { setAssessment(updated); setShowProcedureEdit(false); }}
+        />
+      )}
     </div>
   );
 }

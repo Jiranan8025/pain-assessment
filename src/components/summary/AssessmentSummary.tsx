@@ -126,6 +126,25 @@ const AssessmentSummary = forwardRef<HTMLDivElement, Props>(({ assessment, patie
                 <span className="text-gray-600 ml-2">(From: {assessment.consult_from})</span>
               )}
             </div>
+            <div className="px-2 py-1.5 border-t border-r border-gray-300">
+              <span className="text-gray-500">ผู้ป่วยใหม่:</span>{' '}
+              <span className="font-bold text-gray-900">{assessment.is_new_case === true ? 'ใช่' : assessment.is_new_case === false ? 'ไม่ใช่' : '—'}</span>
+            </div>
+            <div className="px-2 py-1.5 border-t border-gray-300">
+              <span className="text-gray-500">ตอบแบบสอบถาม:</span>{' '}
+              <span className="font-bold text-gray-900">{assessment.assessment_timing === 'pre_procedure' ? 'ก่อนทำหัตถการ' : assessment.assessment_timing === 'post_procedure' ? 'หลังทำหัตถการ' : '—'}</span>
+            </div>
+            <div className="px-2 py-1.5 border-t border-r border-gray-300">
+              <span className="text-gray-500">หัตถการเพื่อ:</span>{' '}
+              <span className="font-bold text-gray-900">
+                {assessment.procedure_purpose === 'diagnostic' ? 'การวินิจฉัย' : assessment.procedure_purpose === 'therapeutic' ? 'การรักษา' : '—'}
+                {assessment.procedure_name && ` (${assessment.procedure_name})`}
+              </span>
+            </div>
+            <div className="px-2 py-1.5 border-t border-gray-300">
+              <span className="text-gray-500">วันนัดหัตถการ:</span>{' '}
+              <span className="font-bold text-gray-900">{assessment.procedure_date ? formatThaiDate(assessment.procedure_date) : '—'}</span>
+            </div>
           </div>
         </div>
 

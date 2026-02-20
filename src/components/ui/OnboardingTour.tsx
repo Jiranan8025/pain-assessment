@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export interface TourStep {
   target: string | null;
@@ -155,22 +155,31 @@ export default function OnboardingTour({
 
   const isNavigateStep = currentStep.navigateAction && firstPatientId && onNavigateToPatient;
   const isLastStep = step >= activeSteps.length - 1;
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   const getTooltipStyle = (): React.CSSProperties => {
+    const margin = 16;
     if (!spotlightRect) {
-      return { position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: '340px', width: '90vw' };
+      return { position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: '340px', width: '90vw', maxHeight: `calc(100vh - ${margin * 2}px)` };
     }
     const padding = 12;
     const tooltipWidth = 320;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    let top = spotlightRect.bottom + padding;
+    const spaceBelow = vh - spotlightRect.bottom - padding;
+    const spaceAbove = spotlightRect.top - padding;
+    let top: number;
+    if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
+      top = spotlightRect.bottom + padding;
+    } else {
+      top = Math.max(margin, spotlightRect.top - padding - Math.min(300, spaceAbove));
+    }
     let left = spotlightRect.left + spotlightRect.width / 2 - tooltipWidth / 2;
-    if (top + 220 > vh) top = spotlightRect.top - padding - 220;
     if (left < 12) left = 12;
     if (left + tooltipWidth > vw - 12) left = vw - 12 - tooltipWidth;
-    if (top < 12) top = 12;
-    return { position: 'fixed', top: `${top}px`, left: `${left}px`, maxWidth: `${tooltipWidth}px`, width: '90vw' };
+    if (top < margin) top = margin;
+    const maxH = vh - top - margin;
+    return { position: 'fixed', top: `${top}px`, left: `${left}px`, maxWidth: `${tooltipWidth}px`, width: '90vw', maxHeight: `${maxH}px` };
   };
 
   const getSpotlightStyle = (): React.CSSProperties => {
@@ -196,10 +205,13 @@ export default function OnboardingTour({
       {spotlightRect && (
         <div className="fixed inset-0 z-[9998]" style={{ pointerEvents: 'auto' }} onClick={e => e.stopPropagation()} />
       )}
-      <div style={{ ...getTooltipStyle(), zIndex: 9999 }} className="bg-white rounded-xl shadow-2xl p-5 animate-fade-in">
-        <h3 className="text-base font-bold text-gray-900 mb-2">{currentStep.title}</h3>
-        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{currentStep.description}</p>
-        <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+      <div ref={tooltipRef} style={{ ...getTooltipStyle(), zIndex: 9999 }} className="bg-white rounded-xl shadow-2xl animate-fade-in flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-5 pb-3">
+          <h3 className="text-base font-bold text-gray-900 mb-2">{currentStep.title}</h3>
+          <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{currentStep.description}</p>
+        </div>
+        <div className="shrink-0 px-5 pb-4">
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
           <div className="flex gap-1.5">
             {Array.from({ length: totalSteps }, (_, i) => (
               <div
@@ -228,6 +240,7 @@ export default function OnboardingTour({
           </div>
         </div>
         <p className="text-[10px] text-gray-300 text-center mt-2">{startIndex + step + 1} / {totalSteps}</p>
+        </div>
       </div>
     </div>
   );

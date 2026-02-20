@@ -31,6 +31,19 @@ export const assessmentSubmitSchema = z.object({
   psychologist_recorded: z.boolean(),
   psych_screening_na: z.boolean(),
 
+  // Procedure / Medical info
+  is_new_case: z.boolean().nullable().refine(val => val !== null, {
+    message: 'กรุณาเลือกว่าเป็นผู้ป่วยใหม่หรือไม่',
+  }),
+  assessment_timing: z.enum(['pre_procedure', 'post_procedure']).nullable().refine(val => val !== null, {
+    message: 'กรุณาเลือกตอบแบบสอบถามก่อนหรือหลังทำหัตถการ',
+  }),
+  procedure_purpose: z.enum(['diagnostic', 'therapeutic']).nullable().refine(val => val !== null, {
+    message: 'กรุณาเลือกหัตถการเพื่ออะไร',
+  }),
+  procedure_name: z.string(),
+  procedure_date: z.string(),
+
   // BPI
   has_other_pain: z.boolean().nullable(),
   pain_location_data: z.array(z.object({

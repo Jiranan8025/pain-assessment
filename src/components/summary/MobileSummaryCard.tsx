@@ -11,6 +11,7 @@ import { formatThaiDate } from '../../lib/dateUtils';
 interface Props {
   assessment: Assessment;
   patient: Patient;
+  onEditProcedure?: () => void;
 }
 
 const visitLabel: Record<string, string> = {
@@ -20,7 +21,7 @@ const visitLabel: Record<string, string> = {
   post_procedure: 'Post-procedure',
 };
 
-export default function MobileSummaryCard({ assessment, patient }: Props) {
+export default function MobileSummaryCard({ assessment, patient, onEditProcedure }: Props) {
   const utility = calculateEq5dUtility(
     assessment.eq5d_mobility, assessment.eq5d_self_care,
     assessment.eq5d_usual_activities, assessment.eq5d_pain_discomfort,
@@ -40,6 +41,42 @@ export default function MobileSummaryCard({ assessment, patient }: Props) {
           {formatThaiDate(assessment.assessment_date)} — {visitLabel[assessment.visit_type] || assessment.visit_type}
           {assessment.consult_from && ` (From: ${assessment.consult_from})`}
         </p>
+      </div>
+
+      {/* Procedure Info */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-bold text-sm text-gray-800">ข้อมูลหัตถการ</h3>
+          {onEditProcedure && (
+            <button onClick={onEditProcedure} className="text-xs text-teal-600 font-medium hover:underline">แก้ไข</button>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div>
+            <span className="text-gray-500">ผู้ป่วยใหม่:</span>{' '}
+            <span className="font-medium">{assessment.is_new_case === true ? 'ใช่' : assessment.is_new_case === false ? 'ไม่ใช่' : '—'}</span>
+          </div>
+          <div>
+            <span className="text-gray-500">ตอบแบบสอบถาม:</span>{' '}
+            <span className="font-medium">{assessment.assessment_timing === 'pre_procedure' ? 'ก่อนหัตถการ' : assessment.assessment_timing === 'post_procedure' ? 'หลังหัตถการ' : '—'}</span>
+          </div>
+          <div>
+            <span className="text-gray-500">หัตถการเพื่อ:</span>{' '}
+            <span className="font-medium">{assessment.procedure_purpose === 'diagnostic' ? 'วินิจฉัย' : assessment.procedure_purpose === 'therapeutic' ? 'รักษา' : '—'}</span>
+          </div>
+          {assessment.procedure_name && (
+            <div>
+              <span className="text-gray-500">หัตถการ:</span>{' '}
+              <span className="font-medium">{assessment.procedure_name}</span>
+            </div>
+          )}
+          {assessment.procedure_date && (
+            <div>
+              <span className="text-gray-500">วันนัด:</span>{' '}
+              <span className="font-medium">{formatThaiDate(assessment.procedure_date)}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Pain Scores */}

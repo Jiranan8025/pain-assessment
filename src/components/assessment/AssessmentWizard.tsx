@@ -7,6 +7,7 @@ import BpiForm from './BpiForm';
 import PainInterferenceForm from './PainInterferenceForm';
 import Eq5d5lForm from './Eq5d5lForm';
 import Dass21Form from './Dass21Form';
+import PsychScreeningForm from './PsychScreeningForm';
 
 interface Props {
   data: Assessment;
@@ -21,6 +22,7 @@ interface Props {
 
 const steps = [
   { title: 'ข้อมูลผู้ป่วย', short: 'ผู้ป่วย' },
+  { title: 'Psychological Screening', short: 'Psych' },
   { title: 'BPI - ประเมินความปวด', short: 'BPI' },
   { title: 'Pain Interference', short: 'Interference' },
   { title: 'EQ-5D-5L', short: 'EQ-5D' },
@@ -96,10 +98,11 @@ export default function AssessmentWizard({
               onChange={onChange}
             />
           )}
-          {step === 1 && <BpiForm data={data} onChange={onChange} />}
-          {step === 2 && <PainInterferenceForm data={data} onChange={onChange} />}
-          {step === 3 && <Eq5d5lForm data={data} onChange={onChange} />}
-          {step === 4 && <Dass21Form data={data} onChange={onChange} />}
+          {step === 1 && <PsychScreeningForm data={data} onChange={onChange} />}
+          {step === 2 && <BpiForm data={data} onChange={onChange} />}
+          {step === 3 && <PainInterferenceForm data={data} onChange={onChange} />}
+          {step === 4 && <Eq5d5lForm data={data} onChange={onChange} />}
+          {step === 5 && <Dass21Form data={data} onChange={onChange} />}
         </div>
       </FormErrorBoundary>
 

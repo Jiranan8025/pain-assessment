@@ -8,6 +8,8 @@ export interface Patient {
 }
 
 export type VisitType = 'new_consult' | 'follow_up' | 'pre_procedure' | 'post_procedure';
+export type AssessmentTiming = 'pre_procedure' | 'post_procedure';
+export type ProcedurePurpose = 'diagnostic' | 'therapeutic';
 
 export interface PainLocation {
   x: number;
@@ -23,6 +25,13 @@ export interface Assessment {
   consult_from: string;
   note: string;
   psychologist_recorded: boolean;
+
+  // Procedure / Medical info
+  is_new_case: boolean | null;
+  assessment_timing: AssessmentTiming | null;
+  procedure_purpose: ProcedurePurpose | null;
+  procedure_name: string;
+  procedure_date: string;
 
   // BPI
   has_other_pain: boolean | null;
@@ -78,6 +87,11 @@ export function createEmptyAssessment(): Assessment {
     consult_from: '',
     note: '',
     psychologist_recorded: false,
+    is_new_case: null,
+    assessment_timing: null,
+    procedure_purpose: null,
+    procedure_name: '',
+    procedure_date: '',
     has_other_pain: null,
     pain_location_data: [],
     pain_score_max: 0,

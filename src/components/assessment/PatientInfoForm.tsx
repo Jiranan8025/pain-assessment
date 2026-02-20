@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { Assessment, VisitType } from '../../lib/types';
+import { useState, useEffect } from 'react';
+import type { Assessment, VisitType, AssessmentTiming, ProcedurePurpose } from '../../lib/types';
 import { findPatientByHN } from '../../lib/supabase';
 
 interface Props {
@@ -50,6 +50,16 @@ export default function PatientInfoForm({ data, patientHN, patientName, onPatien
     // Reset status after 3 seconds
     setTimeout(() => setHnLookupStatus('idle'), 3000);
   };
+
+
+  // Auto-set is_new_case from HN lookup
+  useEffect(() => {
+    if (hnLookupStatus === 'found' && data.is_new_case === null) {
+      onChange({ is_new_case: false });
+    } else if (hnLookupStatus === 'not_found' && data.is_new_case === null) {
+      onChange({ is_new_case: true });
+    }
+  }, [hnLookupStatus]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="space-y-6">
@@ -140,6 +150,77 @@ export default function PatientInfoForm({ data, patientHN, patientName, onPatien
           />
         </div>
       )}
+
+
+      {/* ── Procedure / Medical Info ── */}
+      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-4">
+        <h3 className="text-sm font-bold text-gray-700">ข้อมูลหัตถการ</h3>
+
+        {/* 1. is_new_case */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ผู้ป่วยใหม่ <span className="text-red-500">*</span></label>
+          <div className="flex gap-3">
+            {([{ val: true, label: 'ใช่' }, { val: false, label: 'ไม่ใช่' }] as const).map(opt => (
+              <label key={String(opt.val)} className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer border-2 transition-all ${
+                data.is_new_case === opt.val ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 hover:bg-gray-50'
+              }`}>
+                <input type="radio" name="isNewCase" checked={data.is_new_case === opt.val}
+                  onChange={() => onChange({ is_new_case: opt.val })} className="hidden" />
+                <span className="text-sm font-medium">{opt.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* 2. assessment_timing */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">ตอบแบบสอบถาม <span className="text-red-500">*</span></label>
+          <div className="flex gap-3">
+            {([{ val: 'pre_procedure' as AssessmentTiming, label: 'ก่อนทำหัตถการ' }, { val: 'post_procedure' as AssessmentTiming, label: 'หลังทำหัตถการ' }]).map(opt => (
+              <label key={opt.val} className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer border-2 transition-all ${
+                data.assessment_timing === opt.val ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 hover:bg-gray-50'
+              }`}>
+                <input type="radio" name="assessmentTiming" checked={data.assessment_timing === opt.val}
+                  onChange={() => onChange({ assessment_timing: opt.val })} className="hidden" />
+                <span className="text-sm font-medium">{opt.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* 3. procedure_purpose */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">หัตถการเพื่อ <span className="text-red-500">*</span></label>
+          <div className="flex gap-3">
+            {([{ val: 'diagnostic' as ProcedurePurpose, label: 'เพื่อการวินิจฉัย' }, { val: 'therapeutic' as ProcedurePurpose, label: 'เพื่อการรักษา' }]).map(opt => (
+              <label key={opt.val} className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer border-2 transition-all ${
+                data.procedure_purpose === opt.val ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 hover:bg-gray-50'
+              }`}>
+                <input type="radio" name="procedurePurpose" checked={data.procedure_purpose === opt.val}
+                  onChange={() => onChange({ procedure_purpose: opt.val })} className="hidden" />
+                <span className="text-sm font-medium">{opt.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* 4. procedure_name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">หัตถการ</label>
+          <input type="text" value={data.procedure_name}
+            onChange={e => onChange({ procedure_name: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="ชื่อหัตถการ (ถ้ามี)" />
+        </div>
+
+        {/* 5. procedure_date */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">วันที่นัดทำหัตถการ</label>
+          <input type="date" value={data.procedure_date}
+            onChange={e => onChange({ procedure_date: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+      </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Note (ถ้ามี)</label>

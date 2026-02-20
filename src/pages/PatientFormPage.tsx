@@ -14,6 +14,7 @@ import { EQ5D_LABELS, DASS21_QUESTIONS, DASS21_OPTIONS, calculateDass21 } from '
 
 const steps = [
   'ข้อมูลเบื้องต้น',
+  'คัดกรองจิตวิทยา',
   'ประเมินความปวด',
   'ผลกระทบจากความปวด',
   'คุณภาพชีวิต',
@@ -251,8 +252,66 @@ export default function PatientFormPage() {
           </div>
         )}
 
-        {/* ===== Step 1: BPI - ประเมินความปวด ===== */}
+        {/* ===== Step 1: Psychological Screening ===== */}
         {step === 1 && (
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-5">
+            <h2 className="text-lg font-bold text-primary">Psychological Screening</h2>
+            <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-200 space-y-4">
+              <div>
+                <p className="text-sm font-bold text-gray-800 mb-1">ใน 2 สัปดาห์ที่ผ่านมา รวมถึงวันนี้</p>
+                <p className="text-sm text-gray-600 mb-3">ท่านมีอาการเหล่านี้หรือไม่?</p>
+              </div>
+              {[
+                { key: 'depression_risk_1' as const, label: '1. ไม่สบายใจ เซ็ง ทุกข์ใจ เศร้า ท้อแท้ ซึม หงอย' },
+                { key: 'depression_risk_2' as const, label: '2. เบื่อ ไม่อยากพูดไม่อยากทำอะไร หรือทำอะไรก็ไม่สนุกเพลิดเพลิน' },
+              ].map(item => (
+                <div key={item.key} className="p-3 bg-white rounded-lg border border-gray-100">
+                  <p className="text-sm text-gray-800 mb-2">{item.label}</p>
+                  <div className="flex gap-3">
+                    {[true, false].map(val => (
+                      <button key={String(val)} type="button" onClick={() => update({ [item.key]: val })}
+                        className={`flex-1 py-3 rounded-xl font-medium text-base border-2 transition-all ${
+                          data[item.key] === val
+                            ? val ? 'border-yellow-400 bg-yellow-50 text-yellow-700' : 'border-green-400 bg-green-50 text-green-700'
+                            : 'border-gray-200 bg-white text-gray-600'
+                        }`}>
+                        {val ? 'มี (Y)' : 'ไม่มี (N)'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <div className="mt-2">
+                <p className="text-sm font-bold text-gray-800 mb-1">ใน 1 เดือนที่ผ่านมา รวมถึงวันนี้</p>
+              </div>
+              <div className="p-3 bg-white rounded-lg border border-red-100">
+                <p className="text-sm font-bold text-red-700 mb-2">3. ท่านมีความรู้สึกทุกข์ใจจนไม่อยากมีชีวิตอยู่?</p>
+                <div className="flex gap-3">
+                  {[true, false].map(val => (
+                    <button key={String(val)} type="button" onClick={() => update({ suicide_risk: val })}
+                      className={`flex-1 py-3 rounded-xl font-medium text-base border-2 transition-all ${
+                        data.suicide_risk === val
+                          ? val ? 'border-red-400 bg-red-50 text-red-700' : 'border-green-400 bg-green-50 text-green-700'
+                          : 'border-gray-200 bg-white text-gray-600'
+                      }`}>
+                      {val ? 'มี (Y)' : 'ไม่มี (N)'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Others (ถ้ามี)</label>
+                <input type="text" value={data.psych_others}
+                  onChange={e => update({ psych_others: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="อื่นๆ..." />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ===== Step 2: BPI - ประเมินความปวด ===== */}
+        {step === 2 && (
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-5">
             <h2 className="text-lg font-bold text-primary">ประเมินความปวด</h2>
 
@@ -275,8 +334,8 @@ export default function PatientFormPage() {
           </div>
         )}
 
-        {/* ===== Step 2: Pain Interference ===== */}
-        {step === 2 && (
+        {/* ===== Step 3: Pain Interference ===== */}
+        {step === 3 && (
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-5">
             <h2 className="text-lg font-bold text-primary">ผลกระทบจากความปวด</h2>
             <p className="text-sm text-gray-600">
@@ -290,8 +349,8 @@ export default function PatientFormPage() {
           </div>
         )}
 
-        {/* ===== Step 3: EQ-5D-5L ===== */}
-        {step === 3 && (
+        {/* ===== Step 4: EQ-5D-5L ===== */}
+        {step === 4 && (
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-5">
             <h2 className="text-lg font-bold text-primary">คุณภาพชีวิต</h2>
             <p className="text-sm text-gray-600">กรุณาเลือกข้อที่ตรงกับสุขภาพของท่าน <strong>ในวันนี้</strong> มากที่สุด</p>
@@ -327,8 +386,8 @@ export default function PatientFormPage() {
           </div>
         )}
 
-        {/* ===== Step 4: DASS-21 ===== */}
-        {step === 4 && (
+        {/* ===== Step 5: DASS-21 ===== */}
+        {step === 5 && (
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
             <h2 className="text-lg font-bold text-primary">แบบประเมินสุขภาพจิต</h2>
             <p className="text-sm text-gray-600">

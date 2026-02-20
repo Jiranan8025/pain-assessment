@@ -120,55 +120,6 @@ export default function BpiForm({ data, onChange }: Props) {
         </div>
       </div>
 
-      {/* Psychological Screening */}
-      <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-        <h3 className="font-bold text-gray-800 mb-3">Psychological Screening</h3>
-
-        <label className="flex items-center gap-2 mb-3 cursor-pointer">
-          <input type="checkbox" checked={data.psych_screening_na}
-            onChange={e => onChange({ psych_screening_na: e.target.checked })}
-            className="w-4 h-4 rounded" />
-          <span className="text-sm font-medium">N/A</span>
-        </label>
-
-        {!data.psych_screening_na && (
-          <div className="space-y-3">
-            <div className="p-3 bg-white rounded-lg">
-              <p className="text-sm font-semibold text-gray-700 mb-2">Depression Risk</p>
-              <label className="flex items-center gap-2 mb-2 cursor-pointer">
-                <input type="checkbox" checked={data.depression_risk_1}
-                  onChange={e => onChange({ depression_risk_1: e.target.checked })}
-                  className="w-4 h-4 rounded" />
-                <span className="text-sm">มีความไม่สบายใจ เซ็ง ทุกข์ใจ เศร้า ท้อแท้ซึม หงอย</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={data.depression_risk_2}
-                  onChange={e => onChange({ depression_risk_2: e.target.checked })}
-                  className="w-4 h-4 rounded" />
-                <span className="text-sm">มีความเบื่อ ไม่อยากพูดไม่อยากทำอะไร หรือทำอะไรก็ไม่สนุกเพลิดเพลิน</span>
-              </label>
-            </div>
-
-            <div className="p-3 bg-white rounded-lg">
-              <p className="text-sm font-semibold text-red-700 mb-2">Suicide Risk</p>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={data.suicide_risk}
-                  onChange={e => onChange({ suicide_risk: e.target.checked })}
-                  className="w-4 h-4 rounded text-red-600" />
-                <span className="text-sm">มีความรู้สึกทุกข์ใจจนไม่อยากมีชีวิตอยู่</span>
-              </label>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Others (ถ้ามี)</label>
-              <input type="text" value={data.psych_others}
-                onChange={e => onChange({ psych_others: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                placeholder="อื่นๆ..." />
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }
