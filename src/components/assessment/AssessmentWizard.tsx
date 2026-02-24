@@ -22,8 +22,7 @@ interface Props {
 
 const steps = [
   { title: 'ข้อมูลผู้ป่วย', short: 'ผู้ป่วย' },
-  { title: 'Psychological Screening', short: 'Psych' },
-  { title: 'BPI - ประเมินความปวด', short: 'BPI' },
+  { title: 'Psych + BPI', short: 'Psych/BPI' },
   { title: 'Pain Interference', short: 'Interference' },
   { title: 'EQ-5D-5L', short: 'EQ-5D' },
   { title: 'DASS-21', short: 'DASS-21' },
@@ -98,11 +97,15 @@ export default function AssessmentWizard({
               onChange={onChange}
             />
           )}
-          {step === 1 && <PsychScreeningForm data={data} onChange={onChange} />}
-          {step === 2 && <BpiForm data={data} onChange={onChange} />}
-          {step === 3 && <PainInterferenceForm data={data} onChange={onChange} />}
-          {step === 4 && <Eq5d5lForm data={data} onChange={onChange} />}
-          {step === 5 && <Dass21Form data={data} onChange={onChange} />}
+          {step === 1 && (
+            <div className="space-y-8">
+              <PsychScreeningForm data={data} onChange={onChange} />
+              <BpiForm data={data} onChange={onChange} />
+            </div>
+          )}
+          {step === 2 && <PainInterferenceForm data={data} onChange={onChange} />}
+          {step === 3 && <Eq5d5lForm data={data} onChange={onChange} />}
+          {step === 4 && <Dass21Form data={data} onChange={onChange} />}
         </div>
       </FormErrorBoundary>
 
