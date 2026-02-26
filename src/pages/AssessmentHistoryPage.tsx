@@ -198,14 +198,14 @@ export default function AssessmentHistoryPage() {
                 <button
                   data-tour="history-compare-btn"
                   onClick={() => { setCompareMode(!compareMode); setCompareSelected([]); }}
-                  className={`text-sm font-medium px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 ${
+                  className={`text-sm font-medium px-5 py-2.5 rounded-lg transition-all flex items-center gap-2 ${
                     compareMode
                       ? 'bg-purple-600 text-white shadow-sm'
-                      : 'border-2 border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100'
+                      : 'bg-purple-600 text-white hover:bg-purple-700 shadow-md hover:shadow-lg'
                   }`}
                 >
                   <span>{compareMode ? '✕' : '⚖️'}</span>
-                  {compareMode ? 'ยกเลิก' : 'เปรียบเทียบผลประเมิน'}
+                  {compareMode ? 'ยกเลิก' : 'กดเพื่อเปรียบเทียบผลประเมิน'}
                 </button>
                 {compareMode && compareSelected.length === 2 && (
                   <button
