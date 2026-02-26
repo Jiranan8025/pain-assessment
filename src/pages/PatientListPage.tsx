@@ -132,7 +132,8 @@ export default function PatientListPage() {
   };
 
   const filteredAssessments = assessments.filter(a => {
-    if (dateFrom && a.assessment_date < dateFrom) return false;
+    if (dateFrom && !dateTo && a.assessment_date !== dateFrom) return false;
+    if (dateFrom && dateTo && a.assessment_date < dateFrom) return false;
     if (dateTo && a.assessment_date > dateTo) return false;
     if (search) {
       const s = search.toLowerCase();
